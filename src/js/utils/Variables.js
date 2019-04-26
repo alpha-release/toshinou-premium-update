@@ -1,116 +1,103 @@
-/*
-  ------------SUP----------
- --------- WHAT YOU----------
-----------DOING HERE----------
-*/
-
 class Variables {
 	static get assetCreateX() {
-		return "_-u1i";
+		return "_-I4A";
 	}
 	
 	static get assetCreateY() {
-		return "_-n1n";
+		return "_-9S";
 	}
 	
 	static get boxType() {
-		return "_-7R";
+		return "_-6m";
 	}
 	
 	static get gateId() {
-		return "_-U4s";
+		return "_-zU";
 	}
 	
 	static get gateType() {
-		return "_-b3V";
+		return "_-Z4e";
 	}
 	
 	static get attackerId() {
-		return "_-w1S";
+		return "_-H1q";
 	}
 	
 	static get heroAttackedId() {
-		return "_-Ji";
+		return "_-aa";
 	}
 	
 	static get attackHp() {
-		return "_-r1m";
+		return "_-B2d";
 	}
 	
 	static get attackShd() {
-		return "_-A5d";
+		return "_-v3x";
 	}
 	
 	static get heroInitMaxHp() {
-		return "_-25t";
+		return "_-V3Y";
 	}
 	
 	static get heroInitMaxShd() {
-		return "_-w3F";
+		return "_-D4G";
 	}
 	
 	static get heroInitHp() {
-		return "_-ky";
+		return "_-o1k";
 	}
 	
 	static get heroPetId() {
-		return "_-H2Z";
+		return "_-f5";
 	}
 	
 	static get hpUpdateMaxHp() {
-		return "_-H4d";
+		return "_-J2A";
 	}
 	
 	static get hpUpdateHp() {
-		return "_-lW";
+		return "_-y1o";
 	}
 	
 	static get heroUpdateShd() {
-		return "_-J2p";
+		return "_-l1B";
 	}
 	
 	static get resource() {
-		return "_-MC";
-	}
-	
-	static get attackerId() {
-		return "_-w1S";
-	}
-	
-	static get attackedId() {
-		return "_-l4V";
+		return "_-E3W";
 	}
 	
 	static get clanDiplomacy() {
-		return "_-g2G";
+		return "_-uS";
 	}
 	
 	static get shipDestroyedId() {
-		return "_-I3S";
-	}
-	
-	static get moveDuration() {
-		return "_-v3Z";
+		return "_-B15";
 	}
 	
 	static get selectMaxHp() {
-		return "_-H4d";
+		return "_-J2A";
 	}
 	
 	static get selectMaxShd() {
-		return "_-w3F";
+		return "_-D4G";
 	}
 	
 	static get selectHp() {
-		return "_-lW";
+		return "_-y1o";
 	}
+
+	static get moveDuration() {
+		return "_-T4N";
+	}
+		
 	
 	static get resourceType() {
-		return "_-J3";
+		return "_-9A";
 	}
 
 	static get battlestationClanDiplomacy() {
-		return "_-p1B"; 
+		return "_-049"; 
 	}
 	
 }

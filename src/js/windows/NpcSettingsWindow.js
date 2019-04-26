@@ -6,65 +6,28 @@ class NpcSettingsWindow {
 			text: chrome.i18n.getMessage("excludenpcto")
 		});
 
-		let controls = [];
-		let columns = ["Block", "Name", "Priority","Range"];
-		let table = ControlFactory.createTable(columns);
-		this.knownNpcList.forEach((n, i) => {
-			controls.push([
-				{
-					type:'checkbox',
-					name: n,
-					attrs: {
-						  class: n,
-						  checked: window.settings.getNpc(n).blocked
-					},
-					event: function () {window.settings.setNpc(n,this.checked);}
-				},
-				{
-					type:'label',
-					name: n,
-					attrs: {
-						style: 'font-weight:normal; color:white; font-size: 15px;' 
-					}, 
-					labelText: n.replace(/(\}|\{|\:|\.|\(|\)|\-|\=|\[|\]|\\|\/|\<|\>)/g, "")
-				},
-				{
-					type:'number',
-					name:n,
-					attrs:{
-						class: 'ranges '+n,
-						style:"width:50px;",
-						value: window.settings.getNpc(n).priority
-					}, 
-					event:function(){
-						window.settings.setNpcPriority(n, this.value);
-					}
-				},
-				{
-					type:'number',
-					name:n,
-					attrs:{
-						class: 'ranges '+n,
-						style:"width:50px;",
-						value: window.settings.getNpc(n).range
-					}, 
-					event:function(){
-						window.settings.setNpcRange(n, this.value);
-					}
-				}
-			]);
-		});
-		controls.forEach((control) => {
-			ControlFactory.tableFill(table, control);
-		});
-		table.appendTo(this.npcSettingsWindow);
-  }
+    	let controls = [];
 
+		this.knownNpcList.forEach((n, i) => {
+			controls.push({
+					name: `npc${i}`,
+					labelText: n,//.replace(/(\}|\{|\:|\.|\(|\)|\-|\=|\[|\]|\\|\/)/g, ""),
+					appendTo: this.npcSettingsWindow,
+					event: function () {
+					window.settings.setNpc(n, this.checked);
+					}
+			});
+		});
+
+
+		controls.forEach((control) => {
+			this[control.name] = ControlFactory.createControl(control);
+		});
+  }
 
 	get knownNpcList() {
 		return [
 			"\\ Purpose XXI //",
-			"\\ Attend IX //",
 			"-=[ Streuner ]=-",
 			"-=[ Aider Streuner ]=-",
 			"-=[ Recruit Streuner ]=-",
