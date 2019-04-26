@@ -18,7 +18,6 @@ class Api {
 		this.starSystem = [];
 		this.workmap = null;
 		this.jumped = false;
-		this.isRepairing = false;
 		this.changeConfigTime = $.now();
 		this.changeFormationTime = $.now();
 		this.lastAutoLock = $.now();
@@ -31,16 +30,12 @@ class Api {
 		this.moduleCooldown = -1;
 		this.petHasFuel = true;
 		// QuickSlot stuff
-		this.abilityReady = true;
-		this.abilityDelay = $.now();
+		this.abilityCoolDown = 1;
 		this.formation = -1;
 		this.pauseTime = null;
 		this.pauseStop = null;
 		// sleep
 		this.sleepTime = 0;
-
-		this.enemyLastSight = 0;
-
 	}
 
 	sleeping(){
@@ -64,7 +59,7 @@ class Api {
 		// 0 = activate
 		// 1 = deactivate
 		// 4 = repair
-		this.petActivateTimer = $.now();
+		api.petActivateTimer = $.now();
 		Injector.injectScript('document.getElementById("preloader").petCall('+parseInt(n)+');');
 		this.currentModule = -1;
 	}
@@ -74,32 +69,31 @@ class Api {
 		this.pauseTime = $.now();
 		this.pauseStop = t;
 	}
-	
 	combatMode(){
 		if (window.settings.settings.autoChangeConfig && window.settings.settings.attackConfig != window.hero.shipconfig){
-			this.changeConfig();
+			api.changeConfig();
 		}
-		if (window.settings.settings.changeFormation && !this.isRepairing){
-			if (window.settings.settings.attackFormation != this.formation) {
-				this.changeFormation(window.settings.settings.attackFormation);
+		if (window.settings.settings.changeFormation && !api.isRepairing){
+			if (window.settings.settings.attackFormation != api.formation) {
+				api.changeFormation(window.settings.settings.attackFormation);
 			}
 		}
 	}
 
 	flyingMode(){
 		if (window.settings.settings.autoChangeConfig && window.settings.settings.flyingConfig != window.hero.shipconfig) {
-			this.changeConfig();
+			api.changeConfig();
 		}
-		if (window.settings.settings.changeFormation && this.formation != window.settings.settings.flyingFormation) {
-			this.changeFormation(window.settings.settings.flyingFormation);
+		if (window.settings.settings.changeFormation && api.formation != window.settings.settings.flyingFormation) {
+			api.changeFormation(window.settings.settings.flyingFormation);
 		}
 	}
 
 	useAbility(){
-		// Delay to avoid key press spam
-		if(this.abilityReady && $.now() - this.abilityDelay > 2000){
+		var cooldownlist = {"cyborg":310000,"solace":140000,"diminisher":161000,"venom":180000,"sentinel":215000,"spectrum":195000,"v-lightning":185000};
+		if(this.abilityCoolDown && $.now() - this.abilityCoolDown > cooldownlist[window.hero.skillName]){
 			this.quickSlot(window.settings.settings.abilitySlot);
-			this.abilityDelay = $.now();
+			this.abilityCoolDown = $.now();
 			return true;
 		}
 		return false;
@@ -143,13 +137,9 @@ class Api {
 
 	blackListId(id) {
 		this._blackListedNpcs.push(id);
-	}
-
-	whitelistId(id){
-		if(this.isShipOnBlacklist(id)){
-			var index = this._blackListedNpcs.indexOf(id);
-			this._blackListedNpcs.splice(index, 1);
-		}
+		setTimeout(() => {
+			this._blackListedNpcs.shift();
+		}, 120000);
 	}
 
 	lockShip(ship) {
@@ -327,15 +317,15 @@ class Api {
 		let shipsCount = Object.keys(this.ships).length;
 		for (let property in this.ships) {
 			let ship = this.ships[property];
-			if (ship && ship.name.indexOf("Devourer") != -1) {
-				window.settings.settings.resetTargetWhenHpBelow25Percent = false;
+			if (ship && (ship.name == "-=[ Devourer ]=- ζ25" || ship.name == "-=[ Devourer ]=- ζ27")) {
+				window.settings.settings.resetTargetWhenHpBelow25Percent=false;
 				if (shipsCount > 1) {
-					this.blackListId(ship.id);
+					window.settings.setNpc(ship.name, true);
 					if (this.targetShip == ship) {
 						this.resetTarget("enemy");
 					}
 				} else {
-					this.whitelistId(ship.id);
+					window.settings.setNpc(ship.name, false);
 					this.targetShip = ship;
 				}
 			}
@@ -408,7 +398,6 @@ class Api {
 			let dist = box.distanceTo(window.hero.position);
 			if (dist < minDist) {
 				if (!box.isResource() && ((box.isCollectable() && window.settings.settings.bonusBox) ||
-					(box.isEvent() && window.settings.settings.eventBox) || 
 					((box.isMaterial() || box.isDropRes()) && window.settings.settings.materials) ||
 					(box.isPalladium() && window.settings.settings.palladium) ||
 					(box.isCargoBox() && window.settings.settings.cargoBox) ||
@@ -431,7 +420,6 @@ class Api {
 	findNearestShip() {
 		let minDist = window.settings.settings.palladium ? window.settings.settings.npcCircleRadius : 100000;
 		let finalShip;
-		let highestPriority = -1;
 
 		if (!window.settings.settings.killNpcs) {
 			return {
@@ -443,41 +431,22 @@ class Api {
 		for (let property in this.ships) {
 			let ship = this.ships[property];
 			ship.update();
-
 			let dist = ship.distanceTo(window.hero.position);
-			let priority = window.settings.getNpc(ship.name).priority;
 
-			if (ship.isNpc && !window.settings.getNpc(ship.name).blocked && !this.isShipOnBlacklist(ship.id) && !ship.isAttacked) {
-				if((ship.firstAttacker == null || (ship.firstAttacker != null && ship.firstAttacker == window.hero.id) ||
-					!window.settings.settings.avoidAttackedNpcs)) {
-					if(priority > highestPriority){	
+			if (dist < minDist) {
+				if (ship.isNpc && window.settings.getNpc(ship.name) && !this.isShipOnBlacklist(ship.id) && !ship.isAttacked) {
+					if(ship.firstAttacker == null || (ship.firstAttacker != null && ship.firstAttacker == window.hero.id)){
 						finalShip = ship;
 						minDist = dist;
-						highestPriority = priority;
-					}else if(priority == highestPriority && minDist > dist){
-						finalShip = ship;
-						minDist = dist;
-						highestPriority = priority;
 					}
 				}
 			}
 		}
 
 		return {
-			ship: finalShip,
-			distance: minDist
+		ship: finalShip,
+		distance: minDist
 		};
-	}
-
-	findEnemy(){
-		for (let property in this.ships) {
-			let ship = this.ships[property];
-
-			if(ship.isEnemy && !ship.isNpc){
-				return ship;
-			}
-		}
-		return null;
 	}
 
 	findNearestGate() {
@@ -500,13 +469,12 @@ class Api {
 		};
 	}
 	
-	findNearestGateForRunAway(enemy) {
+	  	  findNearestGateForRunAway(enemy) {
 		let minDist = 100000;
 		let finalGate;
 		let bestGate = 0;
 		let bestDist = 0;
-		for(var g = 0; g < this.gates.length; g++){
-			let gate = this.gates[g];
+		this.gates.forEach(gate => {
 			// Avoid pvp gates if Jump and Return is enabled
 			// 1-5->4-4 | 3-5->4-4 | 2-5->4-4 | 1-4->4-1 | 2-4->4-2 | 3-4->4-3 | x-8->x-BL respectively
 			let pvpgates = [150000299, 150000319,150000330, 150000191, 150000192, 150000193, 150000209, 150000205, 150000201];
@@ -514,11 +482,6 @@ class Api {
 				let enemeyDistance = enemy.distanceTo(gate.position);
 				let dist = window.hero.distanceTo(gate.position);
 
-				if(dist < 1000){
-					finalGate = gate;
-					minDist = dist;
-					break;
-				}
 				if (enemeyDistance < dist) {
 					bestGate = gate;
 					bestDist = dist;
@@ -529,7 +492,7 @@ class Api {
 					}
 				}
 			}
-		}
+		});
 
 		// If no good gate found, just run away to the closest
 		if(finalGate == null){
@@ -543,14 +506,10 @@ class Api {
 		};
 	}
 
-
 	fleeFromEnemy(enemy) {
 		let gate = this.findNearestGateForRunAway(enemy);
 		if(gate.gate){
 			let dist = window.hero.distanceTo(gate.gate.position);
-			if(!window.fleeingFromEnemy && dist < 500){
-				window.stayInPortal = true;
-			}
             if (window.settings.settings.useAbility && dist > 350 &&
                 (window.hero.skillName == "spectrum" ||
                     window.hero.skillName == "sentinel" ||
@@ -561,8 +520,8 @@ class Api {
                 // Excludes shield factor if there's no shield on the configuration
                 if (isNaN(shdPercent))
                     shdPercent = 100;
-                if (Math.min(hpPercent, shdPercent) < window.settings.settings.repairStartPercent)
-					this.useAbility();
+                if (Math.min(hpPercent, shdPercent) < window.settings.settings.repairWhenHpIsLowerThanPercent)
+                    api.useAbility();
             }
 			if(window.settings.settings.jumpFromEnemy && !window.stayInPortal){
 				if (this.jumpAndGoBack(gate.gate.gateId)) {
@@ -718,7 +677,7 @@ class Api {
 		portals13.push(new Portal(150000165,7)); // 1-3 | 1-2
 		this.starSystem.push(new Map(3, portals13));
 		let portals14 = [];
-		portals14.push(new Portal(150000164,2));  // 1-4 | 1-2
+		portals14.push(new Portal(150000164,2));  // 1-4 | 1-2 
 		portals14.push(new Portal(150000186,3));  // 1-4 | 1-3
 		portals14.push(new Portal(150000189,13)); // 1-4 | 4-1
 		portals14.push(new Portal(150000169,12)); // 1-4 | 3-4
@@ -780,71 +739,71 @@ class Api {
 		portals42.push(new Portal(150000291,16)); //4-2 | 4-4
 		this.starSystem.push(new Map(14, portals42));
 		let portals44 = [];
-		portals44.push(new Portal(150000328,25)); //4-4 | 3-5
-		portals44.push(new Portal(150000304,15)); //4-4 | 4-3
-		portals44.push(new Portal(150000302,14)); //4-4 | 4-2
-		portals44.push(new Portal(150000318,21)); //4-4 | 2-5
-		portals44.push(new Portal(150000208,17)); //4-4 | 1-5
-		portals44.push(new Portal(150000200,13)); //4-4 | 4-1
+		portals44.push(new Portal(150000318,25)); //4-4 | 3-5
+		portals44.push(new Portal(150000294,15)); //4-4 | 4-3
+		portals44.push(new Portal(150000292,14)); //4-4 | 4-2
+		portals44.push(new Portal(150000308,21)); //4-4 | 2-5
+		portals44.push(new Portal(150000298,17)); //4-4 | 1-5
+		portals44.push(new Portal(150000290,13)); //4-4 | 4-1
 		this.starSystem.push(new Map(16, portals44));
 		let portals45 = [];
-		portals45.push(new Portal(150000339,17)); //4-5 | 1-5
-		portals45.push(new Portal(150000341,21)); //4-5 | 2-5
-		portals45.push(new Portal(150000343,25)); //4-5 | 3-5
+		portals45.push(new Portal(150000329,17)); //4-5 | 1-5
+		portals45.push(new Portal(150000331,21)); //4-5 | 2-5
+		portals45.push(new Portal(150000333,25)); //4-5 | 3-5
 		this.starSystem.push(new Map(29, portals45));
 		let portals15 = [];
-		portals15.push(new Portal(150000309,16)); //1-5 | 4-4
-		portals15.push(new Portal(150000338,29)); //1-5 | 4-5
-		portals15.push(new Portal(150000310,18)); //1-5 | 1-6
-		portals15.push(new Portal(150000312,19)); //1-5 | 1-7
+		portals15.push(new Portal(150000299,16)); //1-5 | 4-4
+		portals15.push(new Portal(150000328,29)); //1-5 | 4-5
+		portals15.push(new Portal(150000300,18)); //1-5 | 1-6
+		portals15.push(new Portal(150000302,19)); //1-5 | 1-7
 		this.starSystem.push(new Map(17, portals15));
 		let portals16 = [];
-		portals16.push(new Portal(150000311,17)); //1-6 | 1-5
-		portals16.push(new Portal(150000314,20)); //1-6 | 1-8
+		portals16.push(new Portal(150000301,17)); //1-6 | 1-5
+		portals16.push(new Portal(150000304,20)); //1-6 | 1-8
 		this.starSystem.push(new Map(18, portals16));
 		let portals17 = [];
-		portals17.push(new Portal(150000316,20)); //1-7 | 1-8
-		portals17.push(new Portal(150000313,17)); //1-7 | 1-5
+		portals17.push(new Portal(150000306,20)); //1-7 | 1-8
+		portals17.push(new Portal(150000303,17)); //1-7 | 1-5
 		this.starSystem.push(new Map(19, portals17));
 		let portals18 = [];
-		portals18.push(new Portal(150000315,18)); //1-8 | 1-6
-		portals18.push(new Portal(150000317,19)); //1-8 | 1-7
+		portals18.push(new Portal(150000305,18)); //1-8 | 1-6
+		portals18.push(new Portal(150000307,19)); //1-8 | 1-7
 		this.starSystem.push(new Map(20, portals18));
 		let portals25 = [];
-		portals25.push(new Portal(150000340,16)); //2-5 | 4-4
-		portals25.push(new Portal(150000319,29)); //2-5 | 4-5
-		portals25.push(new Portal(150000320,22)); //2-5 | 2-6
-		portals25.push(new Portal(150000322,23)); //2-5 | 2-7
+		portals25.push(new Portal(150000330,16)); //2-5 | 4-4
+		portals25.push(new Portal(150000309,29)); //2-5 | 4-5
+		portals25.push(new Portal(150000310,22)); //2-5 | 2-6
+		portals25.push(new Portal(150000312,23)); //2-5 | 2-7
 		this.starSystem.push(new Map(21, portals25));
 		let portals26 = [];
-		portals26.push(new Portal(150000321,21)); //2-6 | 2-5
-		portals26.push(new Portal(150000324,24)); //2-6 | 2-8
+		portals26.push(new Portal(150000311,21)); //2-6 | 2-5
+		portals26.push(new Portal(150000314,24)); //2-6 | 2-8
 		this.starSystem.push(new Map(22, portals26));
 		let portals27 = [];
-		portals27.push(new Portal(150000323,21)); //2-7 | 2-5
-		portals27.push(new Portal(150000326,24)); //2-7 | 2-8
+		portals27.push(new Portal(150000313,21)); //2-7 | 2-5
+		portals27.push(new Portal(150000316,24)); //2-7 | 2-8
 		this.starSystem.push(new Map(23, portals27));
 		let portals28 = [];
-		portals28.push(new Portal(150000325,22)); //2-8 | 2-6
-		portals28.push(new Portal(150000327,23)); //2-8 | 2-7
+		portals28.push(new Portal(150000315,22)); //2-8 | 2-6
+		portals28.push(new Portal(150000317,23)); //2-8 | 2-7
 		this.starSystem.push(new Map(24, portals28));
 		let portals35 = [];
-		portals35.push(new Portal(150000329,16)); //3-5 | 4-4
-		portals35.push(new Portal(150000342,29)); //3-5 | 4-5
-		portals35.push(new Portal(150000330,26)); //3-5 | 3-6
-		portals35.push(new Portal(150000332,27)); //3-5 | 3-7
+		portals35.push(new Portal(150000319,16)); //3-5 | 4-4
+		portals35.push(new Portal(150000332,29)); //3-5 | 4-5
+		portals35.push(new Portal(150000320,26)); //3-5 | 3-6
+		portals35.push(new Portal(150000322,27)); //3-5 | 3-7
 		this.starSystem.push(new Map(25, portals35));
 		let portals36 = [];
-		portals36.push(new Portal(150000331,25)); //3-6 | 3-5
-		portals36.push(new Portal(150000334,28)); //3-6 | 3-8
+		portals36.push(new Portal(150000321,25)); //3-6 | 3-5
+		portals36.push(new Portal(150000324,28)); //3-6 | 3-8
 		this.starSystem.push(new Map(26, portals36));
 		let portals37 = [];
-		portals37.push(new Portal(150000333,25)); //3-7 | 3-5
-		portals37.push(new Portal(150000336,28)); //3-7 | 3-8
+		portals37.push(new Portal(150000323,25)); //3-7 | 3-5
+		portals37.push(new Portal(150000326,28)); //3-7 | 3-8
 		this.starSystem.push(new Map(27, portals37));
 		let portals38 = [];
-		portals38.push(new Portal(150000337,27)); //3-8 | 3-7
-		portals38.push(new Portal(150000335,26)); //3-8 | 3-6
+		portals38.push(new Portal(150000327,27)); //3-8 | 3-7
+		portals38.push(new Portal(150000325,26)); //3-8 | 3-6
 		this.starSystem.push(new Map(28, portals38));
 	}
 

@@ -5,7 +5,7 @@ BP Sucks
 Lolis > BP
 */
 
-let _hash = "b0f2677f2504e07193cb2df835bd1000";
+let _hash = "808b33e4d7c201322bd4454b91ed0c00";
 
 let blacklist = [
 	"main-frame",
