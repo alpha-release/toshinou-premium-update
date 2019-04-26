@@ -1,5 +1,4 @@
-
-STATUS:**DISCONTINUED** 
+STATUS: **OUTDATED**
 
 
 Toshinou Ultra
