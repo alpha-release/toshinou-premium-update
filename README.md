@@ -1,5 +1,5 @@
 
-STATUS:**ONLINE** 
+STATUS: **ONLINE** 
 
 
 Toshinou Ultra
