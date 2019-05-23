@@ -1,13 +1,11 @@
+STATUS: **OUTDATED** 30/04/2019
 
-STATUS: **ONLINE**
-
-LAST UPDATE: **25/04/2019**
 
 Toshinou Ultra
 ==========
 A cheat/tool/bot/whatever for a browser flash game named DarkOrbit.
 It does some pretty neat stuff and is still under heavy development.
-The tool was originally created by freshek (https://github.com/freshstudio/Toshinou), but has been modified and updated by a lot of different people
+The tool was originally created by freshek, but has been modified and updated by a lot of different people
 since freshek abandoned it.  
 There's a **HIGH RISK OF BAN**, and i don't recommend you using it on an account you don't want to lose.
 
