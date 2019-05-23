@@ -18,7 +18,7 @@
 
 .window {
   color: #e8e1bf;
-  width: 330;
+  width: 300px;
   background-color: transparent;
   border: 1px solid rgb(40, 116, 144);
 }
@@ -177,12 +177,6 @@
 }
 
 select{
-  background-color: rgba(22, 38, 47, 0.9);
-  border: 1px solid rgb(40, 116, 144);
-  color: rgb(232, 225, 191);
-}
-
-.ranges {
   background-color: rgba(22, 38, 47, 0.9);
   border: 1px solid rgb(40, 116, 144);
   color: rgb(232, 225, 191);

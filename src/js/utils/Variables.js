@@ -1,116 +1,122 @@
 /*
-  ------------SUP----------
- --------- WHAT YOU----------
-----------DOING HERE----------
+-
+-
+-
+---Updated by zamvea---
+---04-04-2019---
+---18:08---
+-
+-
+-
 */
 
 class Variables {
 	static get assetCreateX() {
-		return "_-u1i";
+		return "_-Yq";
 	}
 	
 	static get assetCreateY() {
-		return "_-n1n";
+		return "_-O4T";
 	}
 	
 	static get boxType() {
-		return "_-7R";
+		return "_-9O";
 	}
 	
 	static get gateId() {
-		return "_-U4s";
+		return "_-e2o";
 	}
 	
 	static get gateType() {
-		return "_-b3V";
+		return "_-w2N";
 	}
 	
 	static get attackerId() {
-		return "_-w1S";
+		return "_-v1O";
 	}
 	
 	static get heroAttackedId() {
-		return "_-Ji";
+		return "_-a1N";
 	}
 	
 	static get attackHp() {
-		return "_-r1m";
+		return "_-j12";
 	}
 	
 	static get attackShd() {
-		return "_-A5d";
+		return "_-q1A";
 	}
 	
 	static get heroInitMaxHp() {
-		return "_-25t";
+		return "_-l1r";
 	}
 	
 	static get heroInitMaxShd() {
-		return "_-w3F";
+		return "_-34m";
 	}
 	
 	static get heroInitHp() {
-		return "_-ky";
+		return "_-h4p";
 	}
 	
 	static get heroPetId() {
-		return "_-H2Z";
+		return "_-p26";
 	}
 	
 	static get hpUpdateMaxHp() {
-		return "_-H4d";
+		return "_-s4f";
 	}
 	
 	static get hpUpdateHp() {
-		return "_-lW";
+		return "_-t4u";
 	}
 	
 	static get heroUpdateShd() {
-		return "_-J2p";
+		return "_-43c";
 	}
 	
 	static get resource() {
-		return "_-MC";
+		return "_-72i";
 	}
 	
 	static get attackerId() {
-		return "_-w1S";
+		return "_-v1O";
 	}
 	
 	static get attackedId() {
-		return "_-l4V";
+		return "_-fs";
 	}
 	
 	static get clanDiplomacy() {
-		return "_-g2G";
+		return "_-A3w";
 	}
 	
 	static get shipDestroyedId() {
-		return "_-I3S";
+		return "_-g1m";
 	}
 	
 	static get moveDuration() {
-		return "_-v3Z";
+		return "_-UB";
 	}
 	
 	static get selectMaxHp() {
-		return "_-H4d";
+		return "_-s4f";
 	}
 	
 	static get selectMaxShd() {
-		return "_-w3F";
+		return "_-34m";
 	}
 	
 	static get selectHp() {
-		return "_-lW";
+		return "_-t4u";
 	}
 	
 	static get resourceType() {
-		return "_-J3";
+		return "_-Y31";
 	}
 
 	static get battlestationClanDiplomacy() {
-		return "_-p1B"; 
+		return "_-6I"; 
 	}
 	
 }

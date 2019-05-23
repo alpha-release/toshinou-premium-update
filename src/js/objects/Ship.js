@@ -19,10 +19,6 @@ class Ship extends Movable {
 		this.lastUpdate = $.now();
 	}
 
-	get range(){
-		return window.settings.getNpc(this.name).range;
-	}
-
 	get isEnemy() {
 		return (window.hero.factionId != this.factionId && this.clanDiplomacy != 1 && this.clanDiplomacy != 2 || this.clanDiplomacy == 3);
 	}

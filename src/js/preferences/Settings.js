@@ -7,15 +7,13 @@ class Settings {
 			moveRandomly: false,
 			killNpcs: false,
 			fleeFromEnemy: false,
-			stopFleeing: false,
 			jumpFromEnemy: false,
 			dodgeTheCbs: false,
 			avoidAttackedNpcs: false,
 			circleNpc: false,
 			dontCircleWhenHpBelow25Percent: false,
 			resetTargetWhenHpBelow25Percent: false,
-			repairStartPercent: 30,
-			repairEndPercent: 100,
+			repairWhenHpIsLowerThanPercent: 30,
 			ggbot: false,
 			alpha: false,
 			beta: false,
@@ -26,6 +24,7 @@ class Settings {
 			kappa: false,
 			lambda: false,
 			kronos: false,
+			hades: false,
 			kuiper: false,
 			lockNpc: false,
 			lockPlayers: false,
@@ -35,7 +34,6 @@ class Settings {
 			npcCircleRadius : 500,
 			npcs: {},
 			bonusBox: false,
-			eventBox: false,
 			materials: false,
 			cargoBox: false,
 			greenOrGoldBooty: false,
@@ -62,60 +60,23 @@ class Settings {
 			enablePet: false,
 			petModule: 0,
 			petReviveLimit: 10,
-			changeMode: false,
-			sabSwitcher: false,
-			sabSlot: -1,
-			mainAmmoSlot: -1,
-			workArea : null
+			changeMode: false
 		};
 		chrome.storage.local.get(this.defaults, items => {
 			this.settings = items;
 		});
 	}
 
-	// :|
-	setNpc(name, blocked) {
-		if(this.settings.npcs[name] == null){
-			this.settings.npcs[name] = {blocked: blocked, priority: 1, range:this.settings.npcCircleRadius};
-		}else{
-			this.settings.npcs[name].blocked = blocked;
-		}
-	}
 
-	setNpcPriority(name, priority){
+	setNpc(name, val) {
 		if(this.settings.npcs[name] == null){
-			this.settings.npcs[name] = {blocked: false, priority: priority, range: this.settings.npcCircleRadius};
+			this.settings.npcs[name] = 500;
 		}else{
-			this.settings.npcs[name].priority = priority;
-		}
-	}
-
-	setNpcRange(name, range){
-		if(this.settings.npcs[name] == null){
-			this.settings.npcs[name] = {blocked: false, priority: 1, range: range};
-		}else{
-			this.settings.npcs[name].range = range;
+			this.settings.npcs[name] = val;
 		}
 	}
 
 	getNpc(name) {
-		return {
-			blocked: !this.settings.npcs[name] ?  false: this.settings.npcs[name].blocked,
-			priority: !this.settings.npcs[name] ? 1: this.settings.npcs[name].priority,
-			range: !this.settings.npcs[name] ? this.settings.npcCircleRadius: this.settings.npcs[name].range,
-		}
-	}
-
-	get WorkArea(){
-		return this.settings.workArea;
-	}
-
-	set WorkArea({x, y, w, h}){
-		if((w-x) == 0 || (h - y) == 0){
-			this.settings.workArea = null;
-		}else{
-			this.settings.workArea = {x, y, w, h};
-		}
-		
+		return !this.settings.npcs[name];
 	}
 }

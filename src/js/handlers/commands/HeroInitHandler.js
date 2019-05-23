@@ -1,7 +1,7 @@
 class HeroInitHandler {
-  static get ID() {
-    return 8273; 
-  }
+	static get ID() {
+		return 8273; 
+	}
 
 	constructor(f) {
 		this._handler = function (e, a) {
@@ -13,8 +13,7 @@ class HeroInitHandler {
 			a.resetTarget("all");
 			a.battlestation = null;
 			Injector.injectScript("window.heroDied = false;");
-			window.enemy = null;
-			
+
 			let heroJson = JSON.parse(e.detail);
 
 			// this handler is called after you have jumped to another map
